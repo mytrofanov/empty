@@ -1,25 +1,27 @@
-import logo from './logo.svg';
 import './App.css';
+import axios from "axios";
+import spinner from './img/Spin-1s-200px.svg'
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+    let load = true;
+    console.log(load)
+    axios.get("http://jsonplaceholder.typicode.com/posts")
+        .then(res => {
+            console.log(res.data);
+            load = false;
+        }, reason => {
+            console.log(reason)
+        })
+    console.log(load)
+
+    return (
+        <div>
+            {load && <img src={spinner} alt="Спинер"/>}
+
+
+        </div>
+    );
 }
 
 export default App;
