@@ -1,20 +1,33 @@
 import './App.css';
-import axios from "axios";
 import spinner from './img/Spin-1s-200px.svg'
 import {useState} from "react";
 
-function App() {
-    let [load, setLoad] =  useState(true)
+import axios from "axios";
 
-    console.log(load)
-    axios.get("http://jsonplaceholder.typicode.com/posts")
-        .then(res => {
-            console.log(res.data);
-            setLoad(false);
-        }, reason => {
-            console.log(reason)
-        })
-    console.log(load)
+function App() {
+    let users = {
+        userId:null,
+        id: null,
+        title:null,
+        body:null
+    }
+    let [load, setLoad] = useState(true)
+
+
+    const getFunction = () => {
+        axios.get("http://jsonplaceholder.typicode.com/posts")
+            .then(res => {
+                console.log(res.data);
+                setLoad(false);
+            }, reason => {
+                console.log(reason)
+            })
+    }
+
+    console.log('Статус загрузки:' + load)
+    getFunction()
+    console.log('Статус загрузки:' + load)
+
 
     return (
         <div>
