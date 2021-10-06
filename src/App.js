@@ -1,59 +1,43 @@
 import './App.css';
-import spinner from './img/Spin-1s-200px.svg'
-import {useState} from "react";
-
+import {useEffect, useState} from "react";
 import axios from "axios";
-import {Item} from "./item";
+
 
 function App() {
 
+    const [posts, setPosts] = useState([
+    ])
+    const [loading,setLoading] =useState(false)
 
-    let [arr, setArray] = useState([{
-        userId: null,
-        id: null,
-        title: null,
-        body: null
-    }])
+    useEffect(() => {
+        setLoading(true)
+        console.log("Начало загрузки"+loading)
+            axios.get("http://jsonplaceholder.typicode.com/posts")
+                .then(response => {
+                    setLoading(false)
+                    console.log("Конец загрузки" + loading)
+                    setPosts(response.data)})
+                .catch(error => console.log(error))
 
-    const setUsers = (response)=> {
-        setArray(response)
-    }
-
-    let [load, setLoad] = useState(true)
-
-
-    const getFunction = () => {
-        axios.get("http://jsonplaceholder.typicode.com/posts")
-            .then(res => {
-                setUsers (res.data);
-                console.log('Ответ сервера:' + res.statusText)
-                setLoad(false);
-            })
-            .catch(error => {
-                console.log("error message:", error);
-            });
-    }
-
-
-    if (load) {
-        console.log('Статус загрузки:' + load)
-        getFunction()
-    }
-    if (!load) {
-        console.log('Статус загрузки:' + load)
-    }
-
+        }, []
+    );
 
 
     return (
         <div>
-            {load && <img src={spinner} alt="Спинер"/>}
-            Данные пользователей:
-            {arr.map(u =>
+            {loading && "Loading"}
 
-            <Item userId={u.userId} id={u.id} title={u.title} body={u.body} key={u.id}/>
-            )}
+            <table>
+                <tbody>
+                {posts.map((post,index) =>
 
+                    <tr key={index}>
+                        <td> {index}</td>
+                        <td> {post.id}</td>
+                        <td>{post.title}</td>
+                    </tr>)}
+                </tbody>
+            </table>
         </div>
     );
 }
