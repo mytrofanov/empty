@@ -51,7 +51,7 @@ function App() {
             Данные пользователей:
             {arr.map(u =>
 
-            <Item userId={u.userId} id={u.id} title={u.title} body={u.body} />
+            <Item userId={u.userId} id={u.id} title={u.title} body={u.body} key={u.id}/>
             )}
 
         </div>
