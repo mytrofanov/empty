@@ -6,13 +6,8 @@ import axios from "axios";
 import {Item} from "./item";
 
 function App() {
-    // let users = []
-    // let user = {
-    //     userId: null,
-    //     id: null,
-    //     title: null,
-    //     body: null
-    // }
+
+
     let [arr, setArray] = useState([{
         userId: null,
         id: null,
@@ -26,11 +21,12 @@ function App() {
 
     let [load, setLoad] = useState(true)
 
+
     const getFunction = () => {
         axios.get("http://jsonplaceholder.typicode.com/posts")
             .then(res => {
                 setUsers (res.data);
-                console.log('статус загрузки:' + res.statusText)
+                console.log('Ответ сервера:' + res.statusText)
                 setLoad(false);
             })
             .catch(error => {
@@ -38,9 +34,15 @@ function App() {
             });
     }
 
-    console.log('Статус загрузки:' + load)
-     getFunction()
-    console.log('Статус загрузки:' + load)
+
+    if (load) {
+        console.log('Статус загрузки:' + load)
+        getFunction()
+    }
+    if (!load) {
+        console.log('Статус загрузки:' + load)
+    }
+
 
 
     return (
@@ -48,8 +50,8 @@ function App() {
             {load && <img src={spinner} alt="Спинер"/>}
             Данные пользователей:
             {arr.map(u =>
-            <Item userId={u.id} id={u.id} title={u.title} body={u.body} />
 
+            <Item userId={u.userId} id={u.id} title={u.title} body={u.body} />
             )}
 
         </div>
