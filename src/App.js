@@ -41,7 +41,6 @@ function App() {
     //     resultPosts = posts.find(word => word.title.includes(searchWord))
     //        }
 
-console.log (filteredPosts)
 
     return (
         <div className="messageTableBlock">
@@ -60,6 +59,8 @@ console.log (filteredPosts)
                        })}/>
 
             </div>
+
+            <div>Выбрано {filteredPosts.length} записей из {postsFromServer.length}   </div>
 
             <table>
                 <tbody>
