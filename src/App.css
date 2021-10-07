@@ -36,3 +36,18 @@
     transform: rotate(360deg);
   }
 }
+.searchBlock {
+margin-left: 30%;
+  padding: 15px;
+}
+.messageTableBlock {
+margin-left: 10%;
+
+}
+.messageTableBlock  td{
+ text-align: center;
+  padding: 5px;
+}
+#messageBody {
+  text-align: left;
+}
