@@ -8,7 +8,7 @@ function App() {
     const [postsFromServer, setPostsFromServer] = useState([])
     const [filteredPosts, setFilteredPosts] = useState([])
     const [loading, setLoading] = useState(false)
-    const [q, setQ] = useState("")
+    const [inputTextValue, setInputTextValue] = useState("")
 
 
 
@@ -29,7 +29,7 @@ function App() {
       const filtered =
           postsFromServer &&
           postsFromServer.filter((item) => {
-              return item.title.toLowerCase().includes(e)
+              return item.title.toLowerCase().includes(e.toLowerCase())
           })
           setFilteredPosts(filtered)
 
@@ -51,10 +51,10 @@ function App() {
 
                 <input type="text" id="searchField"
                        placeholder="search"
-                       value={q}
+                       value={inputTextValue}
                        key="searchField"
                        onChange={(event => {
-                           setQ(event.target.value)
+                           setInputTextValue(event.target.value)
                            filtered(event.target.value)
                        })}/>
 
@@ -63,12 +63,15 @@ function App() {
             <div>Выбрано {filteredPosts.length} записей из {postsFromServer.length}   </div>
 
             <table>
+
                 <tbody>
-                <th>№ п/п</th>
-                <th>user Id</th>
-                <th>post Id</th>
-                <th>message title</th>
-                <th>message body</th>
+                <tr>
+                    <th>№ п/п</th>
+                    <th>user Id</th>
+                    <th>post Id</th>
+                    <th>message title</th>
+                    <th>message body</th>
+                </tr>
 
                 {filteredPosts && filteredPosts.length >0 ?
                     filteredPosts.map((post, index) =>
