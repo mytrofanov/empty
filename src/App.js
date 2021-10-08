@@ -9,21 +9,22 @@ function App() {
     const [filteredPosts, setFilteredPosts] = useState([])
     const [loading, setLoading] = useState(false)
     const [inputTextValue, setInputTextValue] = useState("")
+    const [pageNumber, setPageNumber] = useState(1)
 
 
 
     useEffect(() => {
             setLoading(true);
 
-            axios.get("http://jsonplaceholder.typicode.com/posts")
+        axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${pageNumber}`)
                 .then(response => {
                     setLoading(false);
-                    setPostsFromServer(response.data)
-                    setFilteredPosts(response.data)
+                    setPostsFromServer(response.data.items)
+                    setFilteredPosts(response.data.items)
                 })
                 .catch(error => console.log(error))
 
-        }, []
+        }, [pageNumber]
     );
     const filtered = (e) => {
       const filtered =
@@ -68,9 +69,8 @@ function App() {
                 <tr>
                     <th>№ п/п</th>
                     <th>user Id</th>
-                    <th>post Id</th>
-                    <th>message title</th>
-                    <th>message body</th>
+                    <th>Name</th>
+
                 </tr>
 
                 {filteredPosts && filteredPosts.length >0 ?
@@ -80,10 +80,9 @@ function App() {
                     <tr key={index}>
 
                         <td> {index}</td>
-                        <td> {post.userId}</td>
                         <td> {post.id}</td>
-                        <td id="messageBody">{post.title}</td>
-                        <td id="messageBody">{post.body}</td>
+                        <td> {post.name}</td>
+
                     </tr>): null
                 }
 
