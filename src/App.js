@@ -53,23 +53,19 @@ function App() {
     }
 
     const getBigPortion = () => {
-        setTimeout(() => {
-
-            for (let i=0; i < 10; i++) {
-                if (bigPortionOfPosts.length<30) {
+        for (let i = 0; i < 10; i++) {
+            setTimeout(() => {
+                if (bigPortionOfPosts.length < 30) {
                     IncreasePageNumber()
                     setBigPortionOfPosts(bigPortionOfPosts => bigPortionOfPosts.concat(postsFromServer))
                     console.log('Новый цикл № ' + i)
                     console.log(bigPortionOfPosts)
                     console.log('Страница № ' + pageNumber)
-                } else i=10;
-                }
+                } else i = 10;
+            }), (3000)
 
-            }, (3000)
-        )
-
+        }
     }
-
 
 
     return (
