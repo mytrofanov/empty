@@ -7,40 +7,69 @@ function App() {
 
     const [postsFromServer, setPostsFromServer] = useState([])
     const [filteredPosts, setFilteredPosts] = useState([])
+    const [bigPortionOfPosts, setBigPortionOfPosts] = useState([])
+    const [totalCount, setTotalCount] = useState(0)
     const [loading, setLoading] = useState(false)
     const [inputTextValue, setInputTextValue] = useState("")
     const [pageNumber, setPageNumber] = useState(1)
 
 
-
+    // ==================== запрос на сервер =================
     useEffect(() => {
             setLoading(true);
 
-        axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${pageNumber}`)
+            axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${pageNumber}`)
                 .then(response => {
                     setLoading(false);
                     setPostsFromServer(response.data.items)
                     setFilteredPosts(response.data.items)
+                    setTotalCount(response.data.totalCount)
+
                 })
                 .catch(error => console.log(error))
 
         }, [pageNumber]
     );
+
+    // =============== фильтрация входящих массивов ==================
     const filtered = (e) => {
-      const filtered =
-          postsFromServer &&
-          postsFromServer.filter((item) => {
-              return item.title.toLowerCase().includes(e.toLowerCase())
-          })
-          setFilteredPosts(filtered)
+        const filtered =
+            postsFromServer &&
+            postsFromServer.filter((item) => {
+                return item.name.toLowerCase().includes(e.toLowerCase())
+            })
+        setFilteredPosts(filtered)
+    }
 
-      }
 
+    // ================= управление кнопками ========================
 
-    // const MessageFilter = (searchText) => {
-    //      let searchWord = searchText.currentTarget.value
-    //     resultPosts = posts.find(word => word.title.includes(searchWord))
-    //        }
+    const IncreasePageNumber = () => {
+        setPageNumber(pageNumber + 1)
+
+    }
+    const reducePageNumber = () => {
+        pageNumber > 1 && setPageNumber(pageNumber - 1)
+    }
+
+    const getBigPortion = () => {
+        setTimeout(() => {
+
+            for (let i=0; i < 10; i++) {
+                if (bigPortionOfPosts.length<30) {
+                    IncreasePageNumber()
+                    setBigPortionOfPosts(bigPortionOfPosts => bigPortionOfPosts.concat(postsFromServer))
+                    console.log('Новый цикл № ' + i)
+                    console.log(bigPortionOfPosts)
+                    console.log('Страница № ' + pageNumber)
+                } else i=10;
+                }
+
+            }, (3000)
+        )
+
+    }
+
 
 
     return (
@@ -60,8 +89,11 @@ function App() {
                        })}/>
 
             </div>
+            <div>Отображено записей {filteredPosts.length} из {totalCount} </div>
 
-            <div>Выбрано {filteredPosts.length} записей из {postsFromServer.length}   </div>
+            <button onClick={reducePageNumber}>Предыдущая страница</button>
+            <button onClick={IncreasePageNumber}>Следующая страница</button>
+            <button onClick={getBigPortion}>Выдать порцию из 100 записей</button>
 
             <table>
 
@@ -73,17 +105,17 @@ function App() {
 
                 </tr>
 
-                {filteredPosts && filteredPosts.length >0 ?
+                {filteredPosts && filteredPosts.length > 0 ?
                     filteredPosts.map((post, index) =>
 
 
-                    <tr key={index}>
+                        <tr key={index}>
 
-                        <td> {index}</td>
-                        <td> {post.id}</td>
-                        <td> {post.name}</td>
+                            <td> {index}</td>
+                            <td> {post.id}</td>
+                            <td> {post.name}</td>
 
-                    </tr>): null
+                        </tr>) : null
                 }
 
                 </tbody>
