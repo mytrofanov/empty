@@ -56,7 +56,7 @@ function App() {
 
     const IncreasePageNumber = () => {
         setPageNumber(pageNumber + 1)
-
+        console.log('Кнопка нажата')
     }
     let i = pageNumber
     let b = pageNumber + 11
