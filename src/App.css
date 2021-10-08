@@ -63,3 +63,7 @@ margin-left: 10%;
 #messageBody {
   text-align: left;
 }
+button {
+  margin: 15px;
+  padding: 15px;
+}
