@@ -12,6 +12,7 @@ function App() {
     const [loading, setLoading] = useState(false)
     const [inputTextValue, setInputTextValue] = useState("")
     const [pageNumber, setPageNumber] = useState(1)
+    const [pageNumberForBigPortion, setPageNumberForBigPortion] = useState(1)
 
 
     // ==================== запрос на сервер =================
@@ -52,19 +53,25 @@ function App() {
         pageNumber > 1 && setPageNumber(pageNumber - 1)
     }
 
-    const getBigPortion = () => {
-        for (let i = 0; i < 10; i++) {
-            setTimeout(() => {
-                if (bigPortionOfPosts.length < 30) {
-                    IncreasePageNumber()
-                    setBigPortionOfPosts(bigPortionOfPosts => bigPortionOfPosts.concat(postsFromServer))
-                    console.log('Новый цикл № ' + i)
-                    console.log(bigPortionOfPosts)
-                    console.log('Страница № ' + pageNumber)
-                } else i = 10;
-            }), (3000)
+    useEffect(() => {
+        axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${pageNumberForBigPortion}`)
+            .then(response => {
+                setBigPortionOfPosts(bigPortionOfPosts => bigPortionOfPosts.concat(response.data.items))
+            })
+    }, [pageNumberForBigPortion])
 
+    let i =1
+
+    const getBigPortion = () => {
+        if (bigPortionOfPosts.length <= totalCount) {
+            setPageNumberForBigPortion(i)
+            i = i + 1
+            if (i < 4) setTimeout(getBigPortion, 2000)
         }
+
+    }
+    const showBigPortion = () => {
+      console.log(bigPortionOfPosts)
     }
 
 
@@ -89,7 +96,8 @@ function App() {
 
             <button onClick={reducePageNumber}>Предыдущая страница</button>
             <button onClick={IncreasePageNumber}>Следующая страница</button>
-            <button onClick={getBigPortion}>Выдать порцию из 100 записей</button>
+            <button onClick={getBigPortion}>Выдать порцию из 30 записей</button>
+            <button onClick={showBigPortion}>Показать сколько записей в большой порции</button>
 
             <table>
 
