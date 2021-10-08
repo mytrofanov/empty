@@ -8,6 +8,7 @@ function App() {
     const [postsFromServer, setPostsFromServer] = useState([])
     const [filteredPosts, setFilteredPosts] = useState([])
     const [bigPortionOfPosts, setBigPortionOfPosts] = useState([])
+    const [FilteredBigPortionOfPosts, setFilterBigPortionOfPosts] = useState([])
     const [totalCount, setTotalCount] = useState(0)
     const [loading, setLoading] = useState(false)
     const [inputTextValue, setInputTextValue] = useState("")
@@ -42,6 +43,14 @@ function App() {
         setFilteredPosts(filtered)
     }
 
+    const BigFiltered = (e) => {
+        const filtered =
+            bigPortionOfPosts &&
+            bigPortionOfPosts.filter((item) => {
+                return item.name.toLowerCase().includes(e.toLowerCase())
+            })
+        setFilterBigPortionOfPosts(filtered)
+    }
 
     // ================= управление кнопками ========================
 
@@ -53,10 +62,12 @@ function App() {
         pageNumber > 1 && setPageNumber(pageNumber - 1)
     }
 
+    //===================Работа с большими массивами =======================
     useEffect(() => {
         axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${pageNumberForBigPortion}`)
             .then(response => {
                 setBigPortionOfPosts(bigPortionOfPosts => bigPortionOfPosts.concat(response.data.items))
+                setFilterBigPortionOfPosts(FilteredBigPortionOfPosts=>FilteredBigPortionOfPosts.concat(response.data.items))
             })
     }, [pageNumberForBigPortion])
 
@@ -70,17 +81,18 @@ function App() {
         }
 
     }
-    const showBigPortion = () => {
-      console.log(bigPortionOfPosts)
-    }
+
 
 
     return (
-        <div className="messageTableBlock">
+        <div>
+            <button onClick={reducePageNumber}>Предыдущая страница</button>
+            <button onClick={IncreasePageNumber}>Следующая страница</button>
+            <button onClick={getBigPortion}>Выдать порцию из 30 записей</button>
 
-            {loading && "Loading"}
             <div className="searchBlock">
-                Search:
+               <span >
+                Искать в маленькой таблице:
 
                 <input type="text" id="searchField"
                        placeholder="search"
@@ -91,13 +103,35 @@ function App() {
                            filtered(event.target.value)
                        })}/>
 
+            </span>
+               <div>
+                    Искать в большой таблице:
+
+                <input type="text" id="BigSearchField"
+                       placeholder="search"
+                       value={inputTextValue}
+                       key="BigSearchField"
+                       onChange={(event => {
+                           setInputTextValue(event.target.value)
+                           BigFiltered(event.target.value)
+                       })}/>
+
             </div>
+
+            </div>
+
+
             <div>Отображено записей {filteredPosts.length} из {totalCount} </div>
 
-            <button onClick={reducePageNumber}>Предыдущая страница</button>
-            <button onClick={IncreasePageNumber}>Следующая страница</button>
-            <button onClick={getBigPortion}>Выдать порцию из 30 записей</button>
-            <button onClick={showBigPortion}>Показать сколько записей в большой порции</button>
+        <div className="AllTables">
+            <div className="SmallTable">
+
+        <div className="messageTableBlock">
+
+            {loading && "Loading"}
+
+
+
 
             <table>
 
@@ -124,6 +158,37 @@ function App() {
 
                 </tbody>
             </table>
+        </div>
+             <b>   Страница № {pageNumber} </b>
+            </div>
+            <div className="Big Table">
+                <table>
+
+                    <tbody>
+                    <tr>
+                        <th>№ п/п</th>
+                        <th>user Id</th>
+                        <th>Name</th>
+
+                    </tr>
+
+                    {FilteredBigPortionOfPosts && FilteredBigPortionOfPosts.length > 0 ?
+                        FilteredBigPortionOfPosts.map((post, index) =>
+
+                            <tr key={index}>
+
+                                <td> {index}</td>
+                                <td> {post.id}</td>
+                                <td> {post.name}</td>
+
+                            </tr>) : null
+                    }
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
         </div>
     );
 }

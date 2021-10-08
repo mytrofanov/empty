@@ -36,9 +36,21 @@
     transform: rotate(360deg);
   }
 }
+.AllTables {
+  display: flex;
+  flex-direction: row;
+}
+.SmallTable {
+  display: block;
+  width: 40%;
+}
+
 .searchBlock {
-margin-left: 30%;
+margin-left: 5%;
   padding: 15px;
+}
+.searchBlock span{
+padding: 30px;
 }
 .messageTableBlock {
 margin-left: 10%;
