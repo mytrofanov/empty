@@ -16,7 +16,7 @@ function App() {
     const [FreshPortionOfPost, setFreshPortionOfPost] = useState([])
     const [totalCount, setTotalCount] = useState(0)
     const [loading, setLoading] = useState(false)
-    const [inputTextValue, setInputTextValue] = useState("")
+    const [inputTextValue, setInputTextValue] = useState('')
     const [pageNumber, setPageNumber] = useState(1)
 
     const delayLoadingFetchToFalse = () => {
@@ -45,29 +45,30 @@ function App() {
 
 
     // =============== filtering  ==================
-    const filtered = () => {
-
+    const filter = (WordFromSearchBar) => {
+        console.log(inputTextValue)
+        console.log("postsFromServer " + postsFromServer.length)
         const filtered =
              postsFromServer.filter((item) => {
-                return item.name.toLowerCase().includes(inputTextValue.toLowerCase())
+                return item.name.toLowerCase().includes(WordFromSearchBar.toLowerCase())
             })
         setFilteredPosts(filtered)
     }
-
+// inputTextValue is delayed in one render, have to use WordFromSearchBar
 
 
     // ================= buttons ========================
-
+// on each increasing page we increase filteredPosts
     const IncreasePageNumber = () => {
+        console.log(inputTextValue)
+        console.log("pageNumber #" + pageNumber)
         setPageNumber(pageNumber + 1)
-
             const FreshFilteredMessages =
                 FreshPortionOfPost.filter((item) => {
                     return item.name.toLowerCase().includes(inputTextValue.toLowerCase())
                 })
+        pageNumber >=2 &&
             setFilteredPosts(filteredPosts => filteredPosts.concat(FreshFilteredMessages))
-
-
     }
 
 
@@ -81,8 +82,11 @@ function App() {
         i=i+1
         if (i<b) setTimeout(Get100post,10)
     }
-
-const PostsToShow = inputTextValue == 0 ? postsFromServer : filteredPosts
+    const Get1000 = () => {
+        Get100post()
+        filter(inputTextValue)
+    }
+const PostsToShow = !inputTextValue || inputTextValue.length === 0 ? postsFromServer : filteredPosts
 
     return (
         <div className="container">
@@ -98,7 +102,7 @@ const PostsToShow = inputTextValue == 0 ? postsFromServer : filteredPosts
 
             <Stack spacing={2} direction="row">
             <Button onClick={IncreasePageNumber} variant="contained">Следующая страница</Button>
-            <Button onClick={Get100post} variant="contained">Получить 100 постов</Button>
+            <Button onClick={Get1000} variant="contained">Получить 100 постов</Button>
 
 
             </Stack>
@@ -111,9 +115,8 @@ const PostsToShow = inputTextValue == 0 ? postsFromServer : filteredPosts
                        value={inputTextValue}
                        key="searchField"
                        onChange={(event => {
-
                            setInputTextValue(event.target.value)
-                           filtered(event.target.value)
+                           filter(event.target.value)
                        })}/>
 
             </span>
