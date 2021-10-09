@@ -45,7 +45,10 @@ function App() {
 
 
     // =============== filtering  ==================
-    const filter = (WordFromSearchBar) => {
+
+
+        const filter = (WordFromSearchBar) => {
+
         console.log(inputTextValue)
         console.log("postsFromServer " + postsFromServer.length)
         const filtered =
@@ -55,7 +58,7 @@ function App() {
         setFilteredPosts(filtered)
     }
 // inputTextValue is delayed in one render, have to use WordFromSearchBar
-
+    useEffect(()=>filter(inputTextValue),[postsFromServer, inputTextValue])
 
     // ================= buttons ========================
 // on each increasing page we increase filteredPosts
@@ -84,7 +87,7 @@ function App() {
     }
     const Get1000 = () => {
         Get100post()
-        filter(inputTextValue)
+
     }
 const PostsToShow = !inputTextValue || inputTextValue.length === 0 ? postsFromServer : filteredPosts
 
