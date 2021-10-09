@@ -1,5 +1,5 @@
 import './App.css';
-import {useCallback, useEffect, useReducer, useState} from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -8,107 +8,102 @@ import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 
 
+
 function App() {
-    const initialState = {
-        postsFromServer: [],
-        filteredPosts: []
-    }
 
-
-
-    function reducer(state, action) {
-        switch (action.type) {
-            case 'setPostsFromServer':
-                return {...state, postsFromServer: state.postsFromServer.concat(action.postsFromServer)};
-            case 'setFilteredPosts':
-                return {...state, filteredPosts: action.filteredPosts};
-            default:
-                return state;
-        }
-    }
-
-    const [state, dispatch] = useReducer(reducer, initialState);
-    let postsFromServer = state.postsFromServer
-    let filteredPosts = state.filteredPosts
-
-    // const [postsFromServer, setPostsFromServer] = useState([])
-    // const [filteredPosts, setFilteredPosts] = useState([])
-    // const [freshPortionOfPosts, setFreshPortionOfPosts] = useState([])
+    const [postsFromServer, setPostsFromServer] = useState([])
+    const [filteredPosts, setFilteredPosts] = useState([])
+    const [FreshPortionOfPost, setFreshPortionOfPost] = useState([])
     const [totalCount, setTotalCount] = useState(0)
     const [loading, setLoading] = useState(false)
-    const [inputTextValue, setInputTextValue] = useState('')
+    const [inputTextValue, setInputTextValue] = useState("")
     const [pageNumber, setPageNumber] = useState(1)
 
     const delayLoadingFetchToFalse = () => {
         setLoading(false)
     }
 
-    const filter = useCallback(() => {
 
-        const filtered = inputTextValue.trim() === "" ? () => dispatch({type: 'setFilteredPosts', postsFromServer}) :
-            postsFromServer.filter((item) => {
-                return item.name.toLowerCase().includes(inputTextValue.name.toLowerCase())
-            });
-        return () => dispatch({type: 'setFilteredPosts', filtered})
-
-    }, [inputTextValue, postsFromServer])
-
-
-    // ==================== запрос на сервер =================
+    // ==================== server request=================
     useEffect(() => {
             setLoading(true);
 
             axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${pageNumber}`)
                 .then(response => {
-                    let ServerMessages = response.data.items
+                    let DataFromServer= response.data.items
+                    setPostsFromServer(postsFromServer=>postsFromServer.concat(DataFromServer))
+                    setFreshPortionOfPost(DataFromServer)
                     setTotalCount(response.data.totalCount)
-                    setTimeout(delayLoadingFetchToFalse, 1000)
-                    filter()
-                    return () => dispatch({type: 'setPostsFromServer', ServerMessages});
-
-
+                    setTimeout(delayLoadingFetchToFalse,1000)
 
                 })
                 .catch(error => console.log(error))
 
-        }, [pageNumber, filter]
+        }, [pageNumber]
     );
 
 
-    // ================= управление кнопками ========================
+
+    // =============== filtering  ==================
+    const filtered = () => {
+
+        const filtered =
+             postsFromServer.filter((item) => {
+                return item.name.toLowerCase().includes(inputTextValue.toLowerCase())
+            })
+        setFilteredPosts(filtered)
+    }
+
+
+
+    // ================= buttons ========================
 
     const IncreasePageNumber = () => {
         setPageNumber(pageNumber + 1)
-        console.log('Кнопка нажата')
+
+            const FreshFilteredMessages =
+                FreshPortionOfPost.filter((item) => {
+                    return item.name.toLowerCase().includes(inputTextValue.toLowerCase())
+                })
+            setFilteredPosts(filteredPosts => filteredPosts.concat(FreshFilteredMessages))
+
+
     }
+
+
+
+
+
     let i = pageNumber
     let b = pageNumber + 11
     const Get100post = () => {
         setPageNumber(i)
-        i = i + 1
-        if (i < b) setTimeout(Get100post, 10)
+        i=i+1
+        if (i<b) setTimeout(Get100post,10)
     }
 
+const PostsToShow = inputTextValue == 0 ? postsFromServer : filteredPosts
 
     return (
         <div className="container">
             <div className="loading">
-                {loading && <Box sx={{width: '100%'}}>
-                    <LinearProgress/>
+                {loading &&                 <Box sx={{ width: '100%' }}>
+                    <LinearProgress />
                 </Box>}
+
 
 
             </div>
 
 
             <Stack spacing={2} direction="row">
-                <Button onClick={IncreasePageNumber} variant="contained">Следующая страница</Button>
-                <Button onClick={Get100post} variant="contained">Получить 100 постов</Button>
+            <Button onClick={IncreasePageNumber} variant="contained">Следующая страница</Button>
+            <Button onClick={Get100post} variant="contained">Получить 100 постов</Button>
 
 
             </Stack>
             <div className="searchBlock">
-               <span>
+               <span >
                 Искать в  таблице:
 
                 <input type="text" id="searchField"
@@ -116,8 +111,9 @@ function App() {
                        value={inputTextValue}
                        key="searchField"
                        onChange={(event => {
-                           setInputTextValue(event.target.value)
 
+                           setInputTextValue(event.target.value)
+                           filtered(event.target.value)
                        })}/>
 
             </span>
@@ -126,45 +122,46 @@ function App() {
             </div>
 
 
-            <div>Отображено записей {filteredPosts ? filteredPosts.length : "0"} из {totalCount} </div>
-            <b> Страница № {pageNumber} </b>
+            <div>Отображено записей {PostsToShow.length} из {totalCount} </div>
+            <b>   Страница № {pageNumber} </b>
 
-            <div className="AllTables">
-                <div className="SmallTable">
+        <div className="AllTables">
+            <div className="SmallTable">
 
-                    <div className="messageTableBlock">
-
-
-                        <table>
-
-                            <tbody>
-                            <tr>
-                                <th>№ п/п</th>
-                                <th>user Id</th>
-                                <th>Name</th>
-
-                            </tr>
-
-                            {filteredPosts && filteredPosts.length > 0 ?
-                                filteredPosts.map((post, index) =>
+        <div className="messageTableBlock">
 
 
-                                    <tr key={index}>
 
-                                        <td> {index}</td>
-                                        <td> {post.id}</td>
-                                        <td> {post.name}</td>
 
-                                    </tr>) : null
-                            }
 
-                            </tbody>
-                        </table>
-                    </div>
 
-                </div>
+            <table>
+
+                <tbody>
+                <tr>
+                    <th>№ п/п</th>
+                    <th>user Id</th>
+                    <th>Name</th>
+
+                </tr>
+
+                {PostsToShow.map((post, index) =>
+
+                        <tr key={index}>
+                            <td> {index}</td>
+                            <td> {post.id}</td>
+                            <td> {post.name}</td>
+                        </tr>)
+                }
+
+
+                </tbody>
+            </table>
+        </div>
 
             </div>
+
+        </div>
         </div>
     );
 }
