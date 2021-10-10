@@ -215,15 +215,22 @@ function App() {
                                     <tr key={index}>
                                         <td> {index + 1}</td>
                                         <td> {post.id}</td>
+                                        inputTextValue.length >0 ?
+                                        if (searchKeywordIdx > -1) {
                                     textHighlighter = [
                                     post.name.substring(0, searchKeywordIdx),
-                                    <mark key={index}>
-                                {post.name.substring(searchKeywordIdx, searchKeywordIdx + inputTextValue.length)}
+                                    <mark key={index+1}>
+                                        {post.name.substring(searchKeywordIdx, searchKeywordIdx + inputTextValue.length)}
                                     </mark>,
                                     post.name.substring(searchKeywordIdx + inputTextValue.length)
-                                    ];
-                                        <td> {textHighlighter}</td>
-                                    </tr>})
+                                    ]};
+
+                                    };
+                                       <td key={post.name}> {textHighlighter}</td>
+                                        :
+                                        <td> {post.name}</td>
+                                    </tr>}
+                                 )
                                 }
 
 
