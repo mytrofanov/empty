@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-
+import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 
@@ -111,16 +111,25 @@ const PostsToShow = !inputTextValue || inputTextValue.length === 0 ? postsFromSe
             </Stack>
             <div className="searchBlock">
                <span >
-                Искать в  таблице:
+                   <Box
+                       component="form"
+                       sx={{
+                           '& > :not(style)': { m: 1, width: '25ch' },
+                       }}
+                       noValidate
+                       autoComplete="off"
+                   >
+      <TextField id="searchField" label="Search in table"
+                 variant="outlined"
+                 value={inputTextValue}
+                 key="searchField"
+                 onChange={(event => {
+                     setInputTextValue(event.target.value)
+                     filter(event.target.value)
+                 })}
+      />
 
-                <input type="text" id="searchField"
-                       placeholder="search"
-                       value={inputTextValue}
-                       key="searchField"
-                       onChange={(event => {
-                           setInputTextValue(event.target.value)
-                           filter(event.target.value)
-                       })}/>
+    </Box>
 
             </span>
 
