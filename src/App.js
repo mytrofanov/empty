@@ -1,5 +1,5 @@
 import './App.css';
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import axios from "axios";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -13,7 +13,6 @@ function App() {
 
     const [postsFromServer, setPostsFromServer] = useState([])
     const [filteredPosts, setFilteredPosts] = useState([])
-    const [FreshPortionOfPost, setFreshPortionOfPost] = useState([])
     const [totalCount, setTotalCount] = useState(0)
     const [loading, setLoading] = useState(false)
     const [inputTextValue, setInputTextValue] = useState('')
@@ -23,7 +22,7 @@ function App() {
         setLoading(false)
     }
 
-
+    // ================ button & input colors =============
     const theme = createTheme({
         palette: {
             primary: {
@@ -49,7 +48,6 @@ function App() {
                 .then(response => {
                     let DataFromServer = response.data.items
                     setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
-                    setFreshPortionOfPost(DataFromServer)
                     setTotalCount(response.data.totalCount)
                     setTimeout(delayLoadingFetchToFalse, 1000)
 
@@ -61,33 +59,22 @@ function App() {
 
 
     // =============== filtering  ==================
+    const filter  = useCallback(() => {
+             const filtered =
+                postsFromServer.filter((item) => {
+                    return item.name.toLowerCase().includes(inputTextValue.toLowerCase())
+                })
+            setFilteredPosts(filtered)
+         },[inputTextValue, postsFromServer]
+         )
 
 
-    const filter = (WordFromSearchBar) => {
-
-        console.log(inputTextValue)
-        console.log("postsFromServer " + postsFromServer.length)
-        const filtered =
-            postsFromServer.filter((item) => {
-                return item.name.toLowerCase().includes(WordFromSearchBar.toLowerCase())
-            })
-        setFilteredPosts(filtered)
-    }
-// inputTextValue is delayed in one render, have to use WordFromSearchBar
-    useEffect(() => filter(inputTextValue), [postsFromServer, inputTextValue])
+    useEffect(() => filter(), [postsFromServer, inputTextValue, pageNumber, filter])
+//otherwise we get outdated inputTextValue & postsFromServer
 
     // ================= buttons ========================
-// on each increasing page we increase filteredPosts
     const IncreasePageNumber = () => {
-        console.log(inputTextValue)
-        console.log("pageNumber #" + pageNumber)
-        setPageNumber(pageNumber + 1)
-        const FreshFilteredMessages =
-            FreshPortionOfPost.filter((item) => {
-                return item.name.toLowerCase().includes(inputTextValue.toLowerCase())
-            })
-        pageNumber >= 2 &&
-        setFilteredPosts(filteredPosts => filteredPosts.concat(FreshFilteredMessages))
+        setPageNumber(prevState => prevState + 1)
     }
 
 
@@ -102,6 +89,8 @@ function App() {
         Get100post()
 
     }
+
+
     const PostsToShow = !inputTextValue || inputTextValue.length === 0 ? postsFromServer : filteredPosts
 
     return (
@@ -144,7 +133,7 @@ function App() {
                        autoComplete="off"
                    >
       <TextField id="searchField" label="Search in table"
-                 sx={{ color: "darkolivegreen"}}
+                 sx={{color: "darkolivegreen"}}
                  color="primary"
                  focused
                  variant="outlined"
