@@ -1,7 +1,15 @@
 .App {
   text-align: center;
-}
 
+}
+body{
+  background-color: black;
+  color: darkolivegreen;
+
+}
+#searchField {
+  color:darkolivegreen ;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
