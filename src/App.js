@@ -50,23 +50,21 @@ function App() {
                     setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
                     setTotalCount(response.data.totalCount)
                     setTimeout(delayLoadingFetchToFalse, 1000)
-
                 })
                 .catch(error => console.log(error))
-
         }, [pageNumber]
     );
 
 
     // =============== filtering  ==================
-    const filter  = useCallback(() => {
-             const filtered =
+    const filter = useCallback(() => {
+            const filtered =
                 postsFromServer.filter((item) => {
                     return item.name.toLowerCase().includes(inputTextValue.toLowerCase())
                 })
             setFilteredPosts(filtered)
-         },[inputTextValue, postsFromServer]
-         )
+        }, [inputTextValue, postsFromServer]
+    )
 
 
     useEffect(() => filter(), [postsFromServer, inputTextValue, pageNumber, filter])
@@ -74,7 +72,7 @@ function App() {
 
     // ================= buttons ========================
     const IncreasePageNumber = () => {
-        setPageNumber(prevState => prevState + 1)
+        setPageNumber(prevState => prevState + 1);
     }
 
 
@@ -175,7 +173,7 @@ function App() {
                                 {PostsToShow.map((post, index) =>
 
                                     <tr key={index}>
-                                        <td> {index}</td>
+                                        <td> {index + 1}</td>
                                         <td> {post.id}</td>
                                         <td> {post.name}</td>
                                     </tr>)
