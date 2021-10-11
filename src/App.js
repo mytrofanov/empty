@@ -13,6 +13,7 @@ function App() {
 
     const [postsFromServer, setPostsFromServer] = useState([])
     const [filteredPosts, setFilteredPosts] = useState([])
+
     const [totalCount, setTotalCount] = useState(0)
     const [loading, setLoading] = useState(false)
     const [inputTextValue, setInputTextValue] = useState('')
@@ -41,19 +42,19 @@ function App() {
     });
 
     // ==================== server request=================
-    useEffect(() => {
-            setLoading(true);
-
-            axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${pageNumber}`)
-                .then(response => {
-                    let DataFromServer = response.data.items
-                    setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
-                    setTotalCount(response.data.totalCount)
-                    setTimeout(delayLoadingFetchToFalse, 1000)
-                })
-                .catch(error => console.log(error))
-        }, [pageNumber]
-    );
+    // useEffect(() => {
+    //         setLoading(true);
+    //
+    //         axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${pageNumber}`)
+    //             .then(response => {
+    //                 let DataFromServer = response.data.items
+    //                 setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
+    //                 setTotalCount(response.data.totalCount)
+    //                 setTimeout(delayLoadingFetchToFalse, 1000)
+    //             })
+    //             .catch(error => console.log(error))
+    //     }, [pageNumber]
+    // );
 
 
     // =============== filtering  ==================
@@ -63,6 +64,7 @@ function App() {
                     return item.name.toLowerCase().includes(inputTextValue.toLowerCase())
                 })
             setFilteredPosts(filtered)
+
         }, [inputTextValue, postsFromServer]
     )
 
@@ -76,13 +78,39 @@ function App() {
     }
 
 
-    let i = pageNumber
-    let b = pageNumber + 11
+    // let i = pageNumber
+    // let b = pageNumber + 11
     const Get100post = () => {
-        setPageNumber(i)
-        i = i + 1
-        if (i < b) setTimeout(Get100post, 10)
+        let i = pageNumber
+        let b = pageNumber + 10
+        let TenPages = []
+        while (i < b) {
+            i++
+            TenPages.push(i)
+        }
+        setPageNumber(prevState => prevState + 10)
+
+        console.log("TenPages: ", TenPages)
+
+        const GetAllTenPages = TenPages.map((NumberFromTenPages) => {
+            return new Promise(resolve => {
+                axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${NumberFromTenPages}`)
+                    .then(response => {
+                        let DataFromServer = response.data.items
+                        setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
+                        console.log("NumberFromTenPages: ", NumberFromTenPages)
+                    })
+            })
+        })
+        Promise.all(GetAllTenPages).then(() => {
+            console.log("Done");
+            console.log("postsFromServer:", postsFromServer);
+        })
+            .catch(reason => console.log(reason));
+
+
     }
+
     const Get1000 = () => {
         Get100post()
 
