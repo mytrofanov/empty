@@ -82,10 +82,12 @@ function App() {
             .catch(error => console.log(error))
         setPageNumber(increasedPageNumber);
     }
+    //=========initialization, starting with first page:
     useEffect(() => {
         IncreasePageNumber()
     }, [])
 
+    //===========button Get 100 posts consistently
     function Get100Slow() {
         let urls = []
         let i = pageNumber
@@ -99,13 +101,12 @@ function App() {
         const getAllPagesSlow = async (urls) => {
             urls.map(FetchData)
         }
-
-
         getAllPagesSlow(urls)
-            .then(value => console.log(value))
             .catch(error => console.log(error));
 
     }
+
+//===========button Get 100 posts synchronously
 
     const Get100Fast = () => {
         let urlList = []
