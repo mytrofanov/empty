@@ -1,5 +1,5 @@
 import './App.css';
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import axios from "axios";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -13,7 +13,6 @@ function App() {
 
     const [postsFromServer, setPostsFromServer] = useState([])
     const [filteredPosts, setFilteredPosts] = useState([])
-
     const [totalCount, setTotalCount] = useState(0)
     const [loading, setLoading] = useState(false)
     const [inputTextValue, setInputTextValue] = useState('')
@@ -41,20 +40,20 @@ function App() {
         },
     });
 
-    // ==================== server request=================
-    // useEffect(() => {
-    //         setLoading(true);
-    //
-    //         axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${pageNumber}`)
-    //             .then(response => {
-    //                 let DataFromServer = response.data.items
-    //                 setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
-    //                 setTotalCount(response.data.totalCount)
-    //                 setTimeout(delayLoadingFetchToFalse, 1000)
-    //             })
-    //             .catch(error => console.log(error))
-    //     }, [pageNumber]
-    // );
+    // ================ server request=================
+    useEffect(() => {
+            setLoading(true);
+
+            axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${pageNumber}`)
+                .then(response => {
+                    let DataFromServer = response.data.items
+                    setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
+                    setTotalCount(response.data.totalCount)
+                    setTimeout(delayLoadingFetchToFalse, 1000)
+                })
+                .catch(error => console.log(error))
+        }, [pageNumber]
+    );
 
 
     // =============== filtering  ==================
@@ -78,22 +77,19 @@ function App() {
     }
 
 
-    // let i = pageNumber
-    // let b = pageNumber + 11
-    const Get100post = () => {
+    function Get100post() {
         let i = pageNumber
         let b = pageNumber + 10
-        let TenPages = []
+        let TenPagesArray = []
         while (i < b) {
             i++
-            TenPages.push(i)
+            TenPagesArray.push(i)
         }
         setPageNumber(prevState => prevState + 10)
+        console.log(TenPagesArray)
 
-        console.log("TenPages: ", TenPages)
-
-        const GetAllTenPages = TenPages.map((NumberFromTenPages) => {
-            return new Promise(resolve => {
+        TenPagesArray.map((NumberFromTenPages) => {
+            return new Promise(() => {
                 axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${NumberFromTenPages}`)
                     .then(response => {
                         let DataFromServer = response.data.items
@@ -102,20 +98,52 @@ function App() {
                     })
             })
         })
-        Promise.all(GetAllTenPages).then(() => {
-            console.log("Done");
-            console.log("postsFromServer:", postsFromServer);
-        })
-            .catch(reason => console.log(reason));
 
 
-    }
-
-    const Get1000 = () => {
-        Get100post()
+        //this is step by step receiving data====================================================
+        // GetAllTenPages.reduce((PreviousPage, CurrentPage)=>PreviousPage
+        //     .then(CurrentPage), Promise.resolve());
 
     }
 
+    const Get1000 = ()=> {
+
+        async function OnePage(i) {
+            axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${i}`)
+                .then(response => {
+                    let DataFromServer = response.data.items
+                    setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
+                })
+                .catch(error => console.log(error))
+        }
+
+        // let i = pageNumber
+        // let b = pageNumber + 10
+        // let TenPagesByOneStep = []
+        // while (i < b) {
+        //     i++
+        //     TenPagesByOneStep.push(OnePage(i)
+        //     )
+        // }
+        // setPageNumber(prevState => prevState + 10)
+        // console.log(TenPagesByOneStep)
+
+
+        // for (const asyncFn of AllPages) {
+        //     const result = await asyncFn();
+
+       let promises = [OnePage(2), OnePage(5), OnePage(7), OnePage(3), OnePage(9)]
+
+
+
+    //     Promise.all(promises).then((response) => {
+    //
+    //         console.log("Данные с сервера:", response);
+    //     })
+    //         .catch(reason => console.log(reason));
+    //     //
+    //     }
+    }
 
     const PostsToShow = !inputTextValue || inputTextValue.length === 0 ? postsFromServer : filteredPosts
 
@@ -142,7 +170,10 @@ function App() {
                         onClick={IncreasePageNumber} variant="contained">Следующая страница</Button>
                     <Button
                         sx={{color: 'black'}}
-                        onClick={Get1000} variant="contained">Получить 100 постов</Button>
+                        onClick={Get100post} variant="contained">Получить 100 постов последовательно</Button>
+                    <Button
+                        sx={{color: 'black'}}
+                        onClick={Get1000} variant="contained">Получить 100 постов сразу</Button>
 
 
                 </Stack>
