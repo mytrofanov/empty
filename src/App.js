@@ -1,5 +1,5 @@
 import './App.css';
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import axios from "axios";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -40,45 +40,62 @@ function App() {
         },
     });
 
-    // ================ server request=================
-    // useEffect(() => {
-    //         setLoading(true);
-    //
-    //         axios.get(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${pageNumber}`)
-    //             .then(response => {
-    //                 let DataFromServer = response.data.items
-    //                 setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
-    //                 setTotalCount(response.data.totalCount)
-    //                 setTimeout(delayLoadingFetchToFalse, 1000)
-    //             })
-    //             .catch(error => console.log(error))
-    //     }, [pageNumber]
-    // );
-
-
     // =============== filtering  ==================
-    // const filter = useCallback(() => {
-    //         const filtered =
-    //             postsFromServer.filter((item) => {
-    //                 return item.name.toLowerCase().includes(inputTextValue.toLowerCase())
-    //             })
-    //         setFilteredPosts(filtered)
-    //
-    //     }, [inputTextValue, postsFromServer]
-    // )
-    //
-    //
+    const filter = useCallback(() => {
+            const filtered =
+                postsFromServer.filter((item) => {
+                    return item.name.toLowerCase().includes(inputTextValue.toLowerCase())
+                })
+            setFilteredPosts(filtered)
+
+        }, [inputTextValue, postsFromServer]
+    )
+
+    // ================ server request=================
+
+       function fetchData(URL) {
+
+           setLoading(true);
+           return axios
+               .get(URL)
+               .then(response => {
+                   let DataFromServer = response.data.items
+                   return setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
+               })
+               .then(response => {
+                   setTotalCount(response.data.totalCount)
+                   setTimeout(delayLoadingFetchToFalse, 1000)
+                   filter()
+               })
+               .catch(error => console.log(error))
+       }
+
+
+    useEffect(() => fetchData(), [fetchData])
+
+    useEffect(() => {
+        pageNumber === 1 && fetchData(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=1`)
+    }, [pageNumber, fetchData])
+
+
+
+
+
     // useEffect(() => filter(), [postsFromServer, inputTextValue, pageNumber, filter])
-//otherwise we get outdated inputTextValue & postsFromServer
+
+// otherwise we get outdated inputTextValue & postsFromServer
 
     // ================= buttons ========================
     const IncreasePageNumber = () => {
-        setPageNumber(prevState => prevState + 1);
+        let increasedPageNumber = pageNumber + 1
+        fetchData(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${increasedPageNumber}`)
+            .catch(error => console.log(error))
+        setPageNumber(increasedPageNumber);
     }
 
 
-    function Get1000Slow() {
-        let urls=[]
+    function Get100Slow() {
+        let urls = []
         let i = pageNumber
         let b = pageNumber + 10
         while (i < b) {
@@ -88,26 +105,17 @@ function App() {
         setPageNumber(prevState => prevState + 10)
 
         const getAllPagesSlow = async (urls) => {
-                 urls.map(fetchData)
-            }
-
-
-        function fetchData(URL) {
-            return axios
-                .get(URL)
-                .then(response => {
-                    let DataFromServer = response.data.items
-                    return setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
-                })
-                .catch(error=>console.log(error))
+            urls.map(fetchData)
         }
+
+
         getAllPagesSlow(urls)
             .then(value => console.log(value))
             .catch(error => console.log(error));
 
     }
 
-    const Get1000Fast = () => {
+    const Get100Fast = () => {
         let urlList = []
         let i = pageNumber
         let b = pageNumber + 10
@@ -119,18 +127,9 @@ function App() {
         setPageNumber(prevState => prevState + 10)
 
         const getAllPagesFast = async (urlList) => {
-          return Promise.all(urlList.map(fetchData))
-                     }
-
-        function fetchData(URL) {
-            return axios
-                .get(URL)
-                .then(response => {
-                    let DataFromServer = response.data.items
-                    return setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
-                })
-                .catch(error=>console.log(error))
+            return Promise.all(urlList.map(fetchData))
         }
+
         getAllPagesFast(urlList)
             .then(value => console.log(value))
             .catch(error => console.log(error));
@@ -160,10 +159,10 @@ function App() {
                         onClick={IncreasePageNumber} variant="contained">Следующая страница</Button>
                     <Button
                         sx={{color: 'black'}}
-                        onClick={Get1000Slow} variant="contained">Получить 1000 постов последовательно</Button>
+                        onClick={Get100Slow} variant="contained">Получить 1000 постов последовательно</Button>
                     <Button
                         sx={{color: 'black'}}
-                        onClick={Get1000Fast} variant="contained">Получить 1000 постов сразу</Button>
+                        onClick={Get100Fast} variant="contained">Получить 1000 постов сразу</Button>
 
 
                 </Stack>
