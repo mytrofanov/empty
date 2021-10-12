@@ -15,8 +15,9 @@ function App() {
     const [filteredPosts, setFilteredPosts] = useState([])
     const [totalCount, setTotalCount] = useState(0)
     const [loading, setLoading] = useState(false)
+    // const [Initialized, setInitialized] = useState(false)
     const [inputTextValue, setInputTextValue] = useState('')
-    const [pageNumber, setPageNumber] = useState(1)
+    const [pageNumber, setPageNumber] = useState(0)
 
     const delayLoadingFetchToFalse = () => {
         setLoading(false)
@@ -42,6 +43,7 @@ function App() {
 
     // =============== filtering  ==================
     const filter = useCallback(() => {
+
             const filtered =
                 postsFromServer.filter((item) => {
                     return item.name.toLowerCase().includes(inputTextValue.toLowerCase())
@@ -52,47 +54,37 @@ function App() {
     )
 
     // ================ server request=================
+    function FetchData(URL) {
 
-       function fetchData(URL) {
-
-           setLoading(true);
-           return axios
-               .get(URL)
-               .then(response => {
-                   let DataFromServer = response.data.items
-                   return setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
-               })
-               .then(response => {
-                   setTotalCount(response.data.totalCount)
-                   setTimeout(delayLoadingFetchToFalse, 1000)
-                   filter()
-               })
-               .catch(error => console.log(error))
-       }
-
-
-    useEffect(() => fetchData(), [fetchData])
-
-    useEffect(() => {
-        pageNumber === 1 && fetchData(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=1`)
-    }, [pageNumber, fetchData])
+        setLoading(true);
+        return axios
+            .get(URL)
+            .then(response => {
+                let DataFromServer = response.data.items
+                setTotalCount(response.data.totalCount)
+                return setPostsFromServer(postsFromServer => postsFromServer.concat(DataFromServer))
+            })
+            .then(response => {
+                setTimeout(delayLoadingFetchToFalse, 1000)
+                filter()
+            })
+            .catch(error => console.log(error))
+    }
 
 
+    useEffect(() => filter(), [postsFromServer, inputTextValue, pageNumber, filter])
 
-
-
-    // useEffect(() => filter(), [postsFromServer, inputTextValue, pageNumber, filter])
-
-// otherwise we get outdated inputTextValue & postsFromServer
 
     // ================= buttons ========================
     const IncreasePageNumber = () => {
         let increasedPageNumber = pageNumber + 1
-        fetchData(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${increasedPageNumber}`)
+        FetchData(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${increasedPageNumber}`)
             .catch(error => console.log(error))
         setPageNumber(increasedPageNumber);
     }
-
+    useEffect(() => {
+        IncreasePageNumber()
+    }, [])
 
     function Get100Slow() {
         let urls = []
@@ -105,7 +97,7 @@ function App() {
         setPageNumber(prevState => prevState + 10)
 
         const getAllPagesSlow = async (urls) => {
-            urls.map(fetchData)
+            urls.map(FetchData)
         }
 
 
@@ -127,16 +119,15 @@ function App() {
         setPageNumber(prevState => prevState + 10)
 
         const getAllPagesFast = async (urlList) => {
-            return Promise.all(urlList.map(fetchData))
+            return Promise.all(urlList.map(FetchData))
         }
 
         getAllPagesFast(urlList)
-            .then(value => console.log(value))
             .catch(error => console.log(error));
     }
 
-    const PostsToShow = !inputTextValue || inputTextValue.length === 0 ? postsFromServer : filteredPosts
-
+    const PostsToShow = filteredPosts
+    // !inputTextValue || inputTextValue.length === 0 ? postsFromServer :
     return (
         <div className="container">
             <ThemeProvider theme={theme}>
@@ -159,10 +150,10 @@ function App() {
                         onClick={IncreasePageNumber} variant="contained">Следующая страница</Button>
                     <Button
                         sx={{color: 'black'}}
-                        onClick={Get100Slow} variant="contained">Получить 1000 постов последовательно</Button>
+                        onClick={Get100Slow} variant="contained">Получить 100 постов последовательно</Button>
                     <Button
                         sx={{color: 'black'}}
-                        onClick={Get100Fast} variant="contained">Получить 1000 постов сразу</Button>
+                        onClick={Get100Fast} variant="contained">Получить 100 постов сразу</Button>
 
 
                 </Stack>
