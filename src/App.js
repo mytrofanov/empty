@@ -48,13 +48,14 @@ function App() {
                 postsFromServer.filter((item) => {
                     return item.name.toLowerCase().includes(inputTextValue.toLowerCase())
                 })
+
             setFilteredPosts(filtered)
 
         }, [inputTextValue, postsFromServer]
     )
 
     // ================ server request=================
-    function FetchData(URL) {
+    function FetchMessagesFromServer(URL) {
 
         setLoading(true);
         return axios
@@ -78,7 +79,7 @@ function App() {
     // ================= buttons ========================
     const IncreasePageNumber = () => {
         let increasedPageNumber = pageNumber + 1
-        FetchData(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${increasedPageNumber}`)
+        FetchMessagesFromServer(`https://social-network.samuraijs.com/api/1.0/users?count=10&page=${increasedPageNumber}`)
             .catch(error => console.log(error))
         setPageNumber(increasedPageNumber);
     }
@@ -89,6 +90,7 @@ function App() {
 
     //===========button Get 100 posts consistently
     function Get100Slow() {
+
         let urls = []
         let i = pageNumber
         let b = pageNumber + 10
@@ -99,7 +101,7 @@ function App() {
         setPageNumber(prevState => prevState + 10)
 
         const getAllPagesSlow = async (urls) => {
-            urls.map(FetchData)
+            urls.map(FetchMessagesFromServer)
         }
         getAllPagesSlow(urls)
             .catch(error => console.log(error));
@@ -120,15 +122,14 @@ function App() {
         setPageNumber(prevState => prevState + 10)
 
         const getAllPagesFast = async (urlList) => {
-            return Promise.all(urlList.map(FetchData))
+            return Promise.all(urlList.map(FetchMessagesFromServer))
         }
 
         getAllPagesFast(urlList)
             .catch(error => console.log(error));
     }
 
-    const PostsToShow = filteredPosts
-    // !inputTextValue || inputTextValue.length === 0 ? postsFromServer :
+
     return (
         <div className="container">
             <ThemeProvider theme={theme}>
@@ -191,7 +192,7 @@ function App() {
                 </div>
 
 
-                <div>Отображено записей {PostsToShow.length} из {totalCount} </div>
+                <div>Отображено записей {filteredPosts.length} из {totalCount} </div>
                 <b> Страница № {pageNumber} </b>
 
                 <div className="AllTables">
@@ -210,7 +211,7 @@ function App() {
 
                                 </tr>
 
-                                {PostsToShow.map((post, index) =>
+                                {filteredPosts.map((post, index) =>
 
                                     <tr key={index}>
                                         <td> {index + 1}</td>
