@@ -9,6 +9,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 
 
+
 function App() {
 
     const [postsFromServer, setPostsFromServer] = useState([])
@@ -18,7 +19,7 @@ function App() {
     // const [Initialized, setInitialized] = useState(false)
     const [inputTextValue, setInputTextValue] = useState('')
     const [pageNumber, setPageNumber] = useState(0)
-
+    let textHighlighter;
     const delayLoadingFetchToFalse = () => {
         setLoading(false)
     }
@@ -139,8 +140,6 @@ function App() {
                     <Box sx={{width: '100%'}}>
                         <LinearProgress/>
                     </Box>
-
-
                     }
                 </div>
 
@@ -211,13 +210,20 @@ function App() {
 
                                 </tr>
 
-                                {filteredPosts.map((post, index) =>
-
+                                {filteredPosts.map((post, index) => {
+                                    let searchKeywordIdx = post.name.indexOf(inputTextValue);
                                     <tr key={index}>
                                         <td> {index + 1}</td>
                                         <td> {post.id}</td>
-                                        <td> {post.name}</td>
-                                    </tr>)
+                                    textHighlighter = [
+                                    post.name.substring(0, searchKeywordIdx),
+                                    <mark key={index}>
+                                {post.name.substring(searchKeywordIdx, searchKeywordIdx + inputTextValue.length)}
+                                    </mark>,
+                                    post.name.substring(searchKeywordIdx + inputTextValue.length)
+                                    ];
+                                        <td> {textHighlighter}</td>
+                                    </tr>})
                                 }
 
 
