@@ -7,6 +7,7 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
+import {Highlight} from "./highlight/Highlight";
 
 
 function App() {
@@ -216,7 +217,8 @@ function App() {
                                     <tr key={index}>
                                         <td> {index + 1}</td>
                                         <td> {post.id}</td>
-                                        <td> {post.name}</td>
+                                        {inputTextValue===""? <td> {post.name}</td>:
+                                            <td> <Highlight name={post.name} searchText={inputTextValue}/></td> }
                                     </tr>)
                                 }
 

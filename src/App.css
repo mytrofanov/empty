@@ -5,11 +5,15 @@
 body{
   background-color: black;
   color: darkolivegreen;
-
 }
+
 #searchField {
   color:darkolivegreen ;
 }
+.Highlight {
+  color: rosybrown;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
