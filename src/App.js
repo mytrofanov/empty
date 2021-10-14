@@ -7,6 +7,7 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
+import {LightLetters} from "./light/light";
 
 
 
@@ -19,7 +20,6 @@ function App() {
     // const [Initialized, setInitialized] = useState(false)
     const [inputTextValue, setInputTextValue] = useState('')
     const [pageNumber, setPageNumber] = useState(0)
-    let textHighlighter;
     const delayLoadingFetchToFalse = () => {
         setLoading(false)
     }
@@ -211,24 +211,12 @@ function App() {
                                 </tr>
 
                                 {filteredPosts.map((post, index) => {
-                                    let searchKeywordIdx = post.name.indexOf(inputTextValue);
                                     <tr key={index}>
                                         <td> {index + 1}</td>
                                         <td> {post.id}</td>
-                                        inputTextValue.length >0 ?
-                                        if (searchKeywordIdx > -1) {
-                                    textHighlighter = [
-                                    post.name.substring(0, searchKeywordIdx),
-                                    <mark key={index+1}>
-                                        {post.name.substring(searchKeywordIdx, searchKeywordIdx + inputTextValue.length)}
-                                    </mark>,
-                                    post.name.substring(searchKeywordIdx + inputTextValue.length)
-                                    ]};
-
-                                    };
-                                       <td key={post.name}> {textHighlighter}</td>
-                                        :
+                                        {/*!inputTextValue ? */}
                                         <td> {post.name}</td>
+                                        {/*<LightLetters name={post.name} inputTextValue={inputTextValue} />*/}
                                     </tr>}
                                  )
                                 }
